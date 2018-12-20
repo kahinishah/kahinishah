@@ -1,0 +1,177 @@
+---
+title: "Perceptions of Domestic Violence Acceptability"
+author: "Kahini Shah"
+date: "17 December 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(stargazer)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(latexpdf)
+library(readxl)
+library(rmarkdown)
+project <- read_excel("statsProject.xlsx")
+attach(project)
+rsplit <- c(tUrban, tRural)
+r <- c(rep("Urban", 42), rep("Rural", 42))
+split <- c(tPoorest, tSecond, tMiddle, tFourth, tRichest)
+wealth <- c(rep("Poorest", 42),rep("Second", 42),rep("Middle", 42),rep("Fourth", 42),rep("Richest", 42) )
+```
+
+## Introduction
+
+According to the World Health Organization (WHO), 1 in 3 women worldwide have experienced some form of intimate partner (IPV) or non-partner violence in their lifetime (WHO, 2013). Such acts of violence against women have several negative consequences, including injuries and physical ailments, a greater likelihood of experiencing anxiety or depression, as well higher likelihood of engaging in substance abuse (WHO, 2013). Furthermore, IPV places a large economic burden on a country and the world in general, with the total cost being estimated to be 5% of the world's GDP (Hoeffler & Fearon, 2014). 
+
+Given the severity of these effects, it is important to understand what factors contribute to intimate partner violence. The WHO lists several risk factors, including lower levels of educatuon, alcohol abuse as well as low access to paid employment for women. A large number of studies have also found that the extent to which people in a community perceive violence against women to be acceptable also contributes to the rate of physical IPV in a country - i.e. the norms surrounding PV against women in a particular region can have an effect on the actual incidence of IPV in that place (Linos & Kawachi, 2012; WHO, 2013). Since norms are important and relatively inexpensive tool for causing behavioral change, one potential way of addressing the issue of IPV could be through a norm based intervention. However, in order to do this, first it is necessary to understand the factors that are correlated with high or low acceptability of violence against women. Therefore, through this project, I will attempt to explore how norms related to IPV differ in different regions and among different individuals in a country. Specifically, I will attempt to analyze whether there is a signficant difference in the degree to which people in rural and urban areas of country believe that it is justified for a husband to beat his wife if his wife burns the food, argues with him, goes out without telling him, neglects the children or refuses sexual relations. Furthermore, I will also attempt to analyze whether differences in perceptions exist between individuals with differing wealth statuses. The results of such an analysis would be useful as it would provide valuable insight into the characteristics of the population in which norms related to violence against women are the strongest. 
+
+__My primary hypotheses are as follows:__<br/>
+$H_0$: There will be no significant difference in the degree of IPV acceptability between individuals in rural and urban areas.<br/>
+$H_1$: IPV acceptability will be lower among individuals in rural areas compared to individuals in urban areas.<br/>
+$H_2$: There will be no significant difference in the the degree of IPV acceptability between individuals of differing wealth statuses.<br/>
+$H_3$: There will be a significant difference in the the degree of IPV acceptability between individuals of differing wealth statuses. <br/>
+
+## Analytical Strategy
+
+### Data
+
+The data being used for this project is taken primarily from the UNICEF website. Further information regarding the actual prevalence rate of violence against women has been taken from the United Nations Statistic Division (UNSD) website. 
+
+The main variables being analyzed are as follows:  
+
+* __Country:__ Indicates the country name; a total of 42 countries are in the data set _(Categorial)_   
+* __PV:__ Actual rate of physical IPV against women of ages 15-49 (in % terms) _(Quantitative/Ratio)_   
+* __tnorm:__ Total Percentage of men and women of ages 15-49 who believe that it is justified for a husband to beat his wife if his wife burns the food, argues with him, goes out without telling him, neglects the children or refuses sexual relations _(Quantitative/Ratio)_  
+* __tUrban:__ Percentage acceptability of violence against women in urban areas of a country _(Quantitative/Ratio)_   
+* __tRural:__ Percentage acceptability of violence against women in rural areas of a country _(Quantitative/Ratio)_  
+* __tPoorest:__ Percentage acceptability of violence against women among individuals occupying the lowest wealth quintile of a country _(Quantitative/Ratio)_   
+* __tSecond:__ Percentage acceptability of violence against women among individuals occupying the second lowest wealth quintile of a country _(Quantitative/Ratio)_  
+* __tMiddle:__ Percentage acceptability of violence against women among individuals occupying the middle wealth quintile of a country _(Quantitative/Ratio)_   
+* __tFourth:__ Percentage acceptability of violence against women among individuals occupying the second highest wealth quintile of a country _(Quantitative/Ratio)_  
+* __tRichest:__ Percentage acceptability of violence against women among individuals occupying the highest wealth quintile of a country _(Quantitative/Ratio)_  
+
+The following table summarizes the key variables in the data set: 
+```{r}
+df <- tbl_df(project)
+
+df.sum <- df %>%
+  select(PV, tnorm, tUrban, tRural, tPoorest, tSecond, tMiddle, tFourth, tRichest) %>% # select variables to summarise
+  summarise_all(funs(min = min, 
+                      q25 = quantile(., 0.25), 
+                      median = median, 
+                      mean = mean,
+                      q75 = quantile(., 0.75), 
+                      max = max))
+
+df.stats.tidy <- df.sum %>% gather(stat, val) %>%
+  separate(stat, into = c("var", "stat"), sep = "_") %>%
+  spread(stat, val) %>%
+  select(var, min, q25, median, mean, q75, max) # reorder columns
+
+print(df.stats.tidy)
+
+```
+
+We can see from this tables that the across all countries in the data set, there is a large range in both the prevalence and social acceptability rate of physical IPV against women. Moreover, the average perception of IPV acceptability is higher in rural areas, compared to urban areas as well as higher among poorer people compared to wealthier individuals.
+
+#### Norm Data Visualization
+
+In order to determine which tests would be most appropriate to compare the degree of acceptability of IPV against women in different regions and among different sets of individuals, first it is necessary to understand how the data are distributed. The following plots provide visual representations of some of the data included in the previous table.
+
+__Urban vs Rural Norm Data__
+
+```{r}
+boxplot(rsplit~r, main = "% Acceptability of IPV Against Women in Rural and Urban Areas", ylab = "Percentage Acceptability", xlab = "Region") 
+```
+
+From this plot, we can see that there is a higher mean percentage acceptability of IPV against women in rural areas compared to urban areas. Furthermore, we can see that the data is slightly right skewed and therefore is not normally ditributed.
+
+__Norm Data by Wealth Quintile__
+
+```{r}
+boxplot(split~wealth, main = "% Acceptability of IPV Against Women by Wealth Quintile", ylab = "Percentage Acceptability", xlab = "Wealth Quintile") 
+```
+
+From the boxplots, we see that these data are also right skewed and therefore are not normally distributed. Furthermore, the mean percentage acceptability of IPV appears to be highest among the poorest individuals and lowest among the richest individuals.
+
+#### Preliminary Analysis 
+
+Given that my data involves the combination of two data sets, as part of a preliminary analysis, I will examine the correlation between norms related to IPV and actual prevalence of physical IPV in order to assess whether the findings from past literature hold true for my data set. 
+
+Below is a scatterplot depicting the relationship between the percentage of overall acceptability of IPV and the actual prevalence rate.
+
+```{r}
+ggplot(project, aes(x = tnorm, y = PV)) + geom_point() + theme_minimal() + labs(title ="% Overall Acceptability of Intimate Partner Violence Against Women vs Rate of Physical IPV", x = "Acceptability of Violence Against Women", y = "Rate of Physical IPV") 
+
+```
+
+We can see from the scatterplot that there appears to be a moderately strong positive linear correlation between the norms of acceptability of IPV against women and the actual rate of physical IPV for the countries in the data set.
+
+Next, we will conduct a simple linear regression to further test the relationship between these quantitative variables.
+
+```{r}
+reg <- lm(PV ~ tnorm)
+summary(reg)
+```
+
+We can see from these results that the coefficient for tnorm is significan,t and while this simple linear regression does not take into account and control for other variables that might affect the actual rate of IPV against women, the results from this preliminary analysis suggest that the findings from existing literature hold true for my data set.
+
+### Main Analysis Methods and Results
+
+__Urban vs. Rural Norm Data__
+
+The explanatory variable in this case is whether the sampled individuals come from an urban or rural region of a country. The response variable is their perceptions of how justified IPV against women is.
+
+Given that the data are not normally distributed, in order to analayze the difference in norm perceptions between people in urban and rural areas, a non parametric test would be appropriate. Since I am attempting to test the difference between two groups, and since my alternative hypothesis in this case is one-tailed, a one-tailed Wilcoxon Rank Test is appropriate.
+
+```{r}
+wilcox.test(tRural, tUrban, alternate = "larger")
+```
+
+The p-value in this case is 0.02523. This value is less than 0.05 but greater than 0.01. Hence, it is sufficiently small to reject the null hypothesis ($H_0$) at the 0.05 level. That is, there is a higher percentage acceptability of IPV against women in rural areas compared to urban areas.
+
+__Norm Data by Wealth Quintile__
+
+The explanatory variable in this case is the wealth quintile of the sampled individuals. The response variable is their perceptions of how justified IPV against women is.
+
+Given that the data are not normally distributed, in order to analayze the difference in norm perceptions between people of different wealth statuses, in this case as well a non parametric test would be appropriate. Since I am attempting to test the difference between more than two groups, a Kruskal Wallis Test is appropriate.
+
+```{r}
+kruskal.test(split~factor(wealth))
+```
+
+The p-value from this analysis is 0.002583 which is less than 0.01 suggesting that we can reject the null hypothesis ($H_2$) that there is no significant difference in IPV acceptability among individuals from different wealth quintiles at the 0.01 level of significance. Given that the Kruskal Wallis Test has yielded a signficant result, it would be appropriate to conduct a non parametric multiple comparisons test, such as the pairwise Mann-Whitney U-Test, to assess which wealth quintiles exhibit significant differences in IPV acceptability.
+
+```{r}
+pairwise.wilcox.test(split, wealth)
+```
+
+The results of this analysis show that there is a significant difference between perceptions among the "Poorest" quintile and the "Richest" quintile of individuals (p<0.01) as well as among the "Second" and "Richest" quintile of individuals (p<0.05). Specifically, the percentage acceptability of IPV against women is significant greater among the poorest of individuals compared to the richest of individuals as well as the second poorest group of individuals compared to the richest individuals.
+
+## Discussion
+
+The results of this study suggest that there is a higher percentage acceptability of violence against women in rural compared to urban areas as well as among individuals in the two lowest wealth quintiles compared to those in the highest wealth quintile. Intuitively, these results make sense: typically patriarchies, and consequently norms promoting the acceptability of IPV against women, are stronger in rural and poor areas and households. 
+
+Despite these intuitive results, however, there are two potential issues with the analyses. First, there might be a __selection bias__ in the data set. Due to the low availability of data and the high prevalence of missing values for many countries, the current data set contains a higher proportion of countries from Africa, Asia and Latin America. These regions contain some of the more developing countries in the world, as well as countries with poor legal entities and lower education levels. In such countries, the behavioral differences between individuals from urban and rural areas as well as individuals having different wealth statuses might be greater than the behavioral differences among individuals from more devloped regions of the world, such as Europe and North America. Hence, one must exhbit caution when attempting to generalize the results from this analysis. Second, there might be certain __confounds__ that bias the results from the analyses. For example, poor education might be a confounding variables that both promotes the acceptability of IPV against women as well as results in lower incomes and consequentlty lower wealth statuses for individuals. Future projects should attempt to gather data on these potential confounds and analyze how they affect the prevalence of norms of IPV acceptability.
+
+## Conclusion
+
+The purpose of this project was to examine how norms promoting IPV against women vary depending on the rural or urban landscape of a region, as well as the wealth level of sampled individuals. In general, our results show that the percentage acceptability of IPV is significantly higher in rural compared to urban regions (reject $H_0$) and that there is a difference in IPV acceptability among individuals from different wealth quintiles of a country (reject $H_2$); more specifically, compared to people in the highest quintile i.e. the richest people, the poorest and second poorest quintiles of individuals show significantly higher acceptability of IPV against women. 
+
+Despite the previously mentioned limitations, these results provide us with a framework for understanding the groups of individuals among which percentage acceptability of IPV acceptability is high. Given that a higher prevalence of IPV acceptability is correlated with a greater incidence of IPV against women, interventions aimed at reducing IPV should closely examine those who have higher perceptions of IPV acceptability i.e. people from poor backgrounds as well as people from rural areas. 
+
+Once again, it is important to reiterate the previously mentioned limitations of both the analysis and the data set, as well as the fact that the original data set did not contain information on whether the actual rates of IPV against women differ by wealth quintile and urban/rural landscape. However, the results of this project do certainly provide an interesting point of reference for understanding how the prevalence of IPV norms is distributed among individuals having different wealth levels as well as across urban and rural regions. Future analyses should attempt to explore why exactly these behavioral differences exist, and how these norms can be addressed and altered to curb the public health crisis of IPV against women.
+
+
+## References
+
+Hoeffler, A., & Fearon, J. (2014). Benefits and costs of the conflict and violence targets for the Post-2015 Development Agenda: Post-2015 Consensus. *Conflict and Violence Assessment Paper. Copenhagen: Copenhagen Consensus Center.*
+
+World Health Organization (WHO), (2013) *Global and regional estimates of violence against women: Prevalence and health effects of intimate partner violence and non-partner sexual violence.* Retrieved from http://apps.who.int/iris/bitstream/handle/10665/85239/9789241564625_eng.pdf?sequence=1
+
+United Nations International Children's Emergency Fund. (2017). *Attitudes and social norms on violence* [Data file]. Retrived from https://data.unicef.org/topic/child-protection/violence/attitudes-and-social-norms-on-violence/
+
+Unites Nations Statistics Division. (2015). *Violence against women* [Data file]. Retrived from https://unstats.un.org/unsd/gender/chapter6/chapter6.html

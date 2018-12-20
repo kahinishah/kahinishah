@@ -1,0 +1,8 @@
+name: "my-website"
+output_dir: "."
+navbar:
+  title: "BDS 522 Project"
+  left:
+    - text: "Perceptions of Domestic Violence Acceptability"
+      href: index.html
+ 
