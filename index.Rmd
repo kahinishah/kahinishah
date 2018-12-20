@@ -104,13 +104,15 @@ Given that my data involves the combination of two data sets, as part of a preli
 Below is a scatterplot depicting the relationship between the percentage of overall acceptability of IPV and the actual prevalence rate.
 
 ```{r}
-ggplot(project, aes(x = tnorm, y = PV)) + geom_point() + theme_minimal() + labs(title ="% Overall Acceptability of Intimate Partner Violence Against Women vs Rate of Physical IPV", x = "Acceptability of Violence Against Women", y = "Rate of Physical IPV") 
+ggplot(project, aes(x = tnorm, y = PV)) + geom_point() + theme_minimal() + labs(title ="% Overall Acceptability of IPV Against Women vs Rate of Physical IPV", x = "Acceptability of Violence Against Women", y = "Rate of Physical IPV") 
 
 ```
+  
 
 We can see from the scatterplot that there appears to be a moderately strong positive linear correlation between the norms of acceptability of IPV against women and the actual rate of physical IPV for the countries in the data set.
 
 Next, we will conduct a simple linear regression to further test the relationship between these quantitative variables.
+
 
 ```{r}
 reg <- lm(PV ~ tnorm)
@@ -127,9 +129,11 @@ The explanatory variable in this case is whether the sampled individuals come fr
 
 Given that the data are not normally distributed, in order to analayze the difference in norm perceptions between people in urban and rural areas, a non parametric test would be appropriate. Since I am attempting to test the difference between two groups, and since my alternative hypothesis in this case is one-tailed, a one-tailed Wilcoxon Rank Test is appropriate.
 
+
 ```{r}
 wilcox.test(tRural, tUrban, alternate = "larger")
 ```
+
 
 The p-value in this case is 0.02523. This value is less than 0.05 but greater than 0.01. Hence, it is sufficiently small to reject the null hypothesis ($H_0$) at the 0.05 level. That is, there is a higher percentage acceptability of IPV against women in rural areas compared to urban areas.
 
@@ -139,15 +143,19 @@ The explanatory variable in this case is the wealth quintile of the sampled indi
 
 Given that the data are not normally distributed, in order to analayze the difference in norm perceptions between people of different wealth statuses, in this case as well a non parametric test would be appropriate. Since I am attempting to test the difference between more than two groups, a Kruskal Wallis Test is appropriate.
 
+
 ```{r}
 kruskal.test(split~factor(wealth))
 ```
 
+
 The p-value from this analysis is 0.002583 which is less than 0.01 suggesting that we can reject the null hypothesis ($H_2$) that there is no significant difference in IPV acceptability among individuals from different wealth quintiles at the 0.01 level of significance. Given that the Kruskal Wallis Test has yielded a signficant result, it would be appropriate to conduct a non parametric multiple comparisons test, such as the pairwise Mann-Whitney U-Test, to assess which wealth quintiles exhibit significant differences in IPV acceptability.
+
 
 ```{r}
 pairwise.wilcox.test(split, wealth)
 ```
+
 
 The results of this analysis show that there is a significant difference between perceptions among the "Poorest" quintile and the "Richest" quintile of individuals (p<0.01) as well as among the "Second" and "Richest" quintile of individuals (p<0.05). Specifically, the percentage acceptability of IPV against women is significant greater among the poorest of individuals compared to the richest of individuals as well as the second poorest group of individuals compared to the richest individuals.
 

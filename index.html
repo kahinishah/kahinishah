@@ -285,7 +285,7 @@ df.stats.tidy &lt;- df.sum %&gt;% gather(stat, val) %&gt;%
 <h4>Preliminary Analysis</h4>
 <p>Given that my data involves the combination of two data sets, as part of a preliminary analysis, I will examine the correlation between norms related to IPV and actual prevalence of physical IPV in order to assess whether the findings from past literature hold true for my data set.</p>
 <p>Below is a scatterplot depicting the relationship between the percentage of overall acceptability of IPV and the actual prevalence rate.</p>
-<pre class="r"><code>ggplot(project, aes(x = tnorm, y = PV)) + geom_point() + theme_minimal() + labs(title =&quot;% Overall Acceptability of Intimate Partner Violence Against Women vs Rate of Physical IPV&quot;, x = &quot;Acceptability of Violence Against Women&quot;, y = &quot;Rate of Physical IPV&quot;) </code></pre>
+<pre class="r"><code>ggplot(project, aes(x = tnorm, y = PV)) + geom_point() + theme_minimal() + labs(title =&quot;% Overall Acceptability of IPV Against Women vs Rate of Physical IPV&quot;, x = &quot;Acceptability of Violence Against Women&quot;, y = &quot;Rate of Physical IPV&quot;) </code></pre>
 <p><img src="index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>We can see from the scatterplot that there appears to be a moderately strong positive linear correlation between the norms of acceptability of IPV against women and the actual rate of physical IPV for the countries in the data set.</p>
 <p>Next, we will conduct a simple linear regression to further test the relationship between these quantitative variables.</p>
