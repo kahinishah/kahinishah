@@ -104,7 +104,7 @@ Given that my data involves the combination of two data sets, as part of a preli
 Below is a scatterplot depicting the relationship between the percentage of overall acceptability of IPV and the actual prevalence rate.
 
 ```{r}
-ggplot(project, aes(x = tnorm, y = PV)) + geom_point() + theme_minimal() + labs(title ="% Overall Acceptability of IPV Against Women vs Rate of Physical IPV", x = "Acceptability of Violence Against Women", y = "Rate of Physical IPV") 
+ggplot(project, aes(x = tnorm, y = PV)) + geom_point() + theme_minimal() + labs(title ="% Overall Acceptability of IPV vs Rate of Physical IPV", x = "Acceptability of Violence Against Women", y = "Rate of Physical IPV") 
 
 ```
   
